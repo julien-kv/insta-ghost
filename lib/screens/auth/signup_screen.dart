@@ -36,7 +36,7 @@ class SignupScreen extends StatelessWidget {
                 
                 // Logo
                 Text(
-                  'Instagram',
+                  'instaghost',
                   style: Theme.of(context).textTheme.displayLarge?.copyWith(
                     fontWeight: FontWeight.w600,
                     fontFamily: 'Billabong',

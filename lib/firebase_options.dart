@@ -52,11 +52,12 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'placeholder-api-key',
-    appId: '1:123456789000:android:0123456789abcdef',
-    messagingSenderId: '123456789000',
-    projectId: 'instagram-clone-placeholder',
-    storageBucket: 'instagram-clone-placeholder.appspot.com',
+    apiKey: "AIzaSyDbjYLbL34qGXAQUIRqUCJjeQK1ky3JGCg",
+    appId: '1:256280889890:android:d6611fdec936a62050987b',
+    messagingSenderId: '256280889890',
+    databaseURL: 'https://insta-ghost-v2-default-rtdb.firebaseio.com/',
+    projectId: 'insta-ghost-v2',
+    storageBucket: 'insta-ghost-v2.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(

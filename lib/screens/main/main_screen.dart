@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:instagram_clone/controllers/auth_controller.dart';
 import 'package:instagram_clone/controllers/post_controller.dart';
 import 'package:instagram_clone/controllers/story_controller.dart';
+import 'package:instagram_clone/routes/app_pages.dart';
 import 'package:instagram_clone/screens/home/home_screen.dart';
 import 'package:instagram_clone/screens/notifications/notifications_screen.dart';
 import 'package:instagram_clone/screens/post/add_post_screen.dart';
@@ -54,7 +55,12 @@ class _MainScreenState extends State<MainScreen> {
   void _onTabTapped(int index) {
     // Special handling for add post
     if (index == 2) {
-      Get.toNamed('/add-post');
+      if (AuthController.to.userModel.value == null) {
+        Get.toNamed(Routes.LOGIN);
+        Get.snackbar('Error', 'Please login to create a post');
+        return;
+      }
+      Get.toNamed(Routes.ADD_POST);
       return;
     }
 

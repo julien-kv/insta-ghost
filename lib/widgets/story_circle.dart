@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:instagram_clone/controllers/story_controller.dart' as story_controller;
 import 'package:instagram_clone/models/story_model.dart';
 import 'package:instagram_clone/models/user_model.dart';
-import 'package:instagram_clone/controllers/story_controller.dart' as story_controller;
 import 'package:instagram_clone/theme/app_theme.dart';
 import 'package:story_view/story_view.dart';
 
@@ -12,11 +12,11 @@ class StoryCircle extends StatelessWidget {
   final bool hasUnseenStories;
 
   const StoryCircle({
-    Key? key,
+    super.key,
     required this.user,
     required this.stories,
     required this.hasUnseenStories,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -101,7 +101,7 @@ class StoryCircle extends StatelessWidget {
                   Navigator.pop(context);
                 }
               },
-              onStoryShow: (storyItem) {
+              onStoryShow: (storyItem, int index) {
                 final index = storyItems.indexOf(storyItem);
                 if (index >= 0 && index < stories.length) {
                   controller.viewStory(stories[index].id);

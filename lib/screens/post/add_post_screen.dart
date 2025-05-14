@@ -1,10 +1,13 @@
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:instagram_clone/controllers/post_controller.dart';
-import 'package:instagram_clone/theme/app_theme.dart';
-import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+
+import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:instagram_clone/controllers/auth_controller.dart';
+import 'package:instagram_clone/controllers/post_controller.dart';
+import 'package:instagram_clone/routes/app_pages.dart';
+import 'package:instagram_clone/theme/app_theme.dart';
 
 class AddPostScreen extends StatefulWidget {
   const AddPostScreen({Key? key}) : super(key: key);
@@ -19,44 +22,57 @@ class _AddPostScreenState extends State<AddPostScreen> {
   final TextEditingController _locationController = TextEditingController();
   final RxBool _isLoading = false.obs;
   File? _image;
-  
+
+  @override
+  void initState() {
+    super.initState();
+    _checkAuth();
+  }
+
+  void _checkAuth() {
+    if (AuthController.to.userModel.value == null) {
+      Get.offAllNamed(Routes.LOGIN);
+      Get.snackbar('Error', 'Please login to create a post');
+    }
+  }
+
   @override
   void dispose() {
     _captionController.dispose();
     _locationController.dispose();
     super.dispose();
   }
-  
+
   Future<void> _pickImage(ImageSource source) async {
     final ImagePicker picker = ImagePicker();
     final XFile? pickedFile = await picker.pickImage(
       source: source,
       imageQuality: 70,
     );
-    
+
     if (pickedFile != null) {
       setState(() {
         _image = File(pickedFile.path);
       });
     }
   }
-  
+
   Future<void> _createPost() async {
     if (_image == null) {
       Get.snackbar('Error', 'Please select an image');
       return;
     }
-    
+
     _isLoading.value = true;
-    
+
     final success = await _postController.createPost(
       _image!,
       _captionController.text.trim(),
       location: _locationController.text.trim(),
     );
-    
+
     _isLoading.value = false;
-    
+
     if (success) {
       Get.back();
       Get.snackbar('Success', 'Post created successfully');
@@ -64,7 +80,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
       Get.snackbar('Error', 'Failed to create post');
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -76,19 +92,17 @@ class _AddPostScreenState extends State<AddPostScreen> {
         ),
         actions: [
           Obx(() => TextButton(
-            onPressed: _isLoading.value || _image == null
-              ? null
-              : _createPost,
-            child: _isLoading.value
-              ? const SizedBox(
-                  height: 20,
-                  width: 20,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                  ),
-                )
-              : const Text('Share'),
-          )),
+                onPressed: _isLoading.value || _image == null ? null : _createPost,
+                child: _isLoading.value
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : const Text('Share'),
+              )),
         ],
       ),
       body: SingleChildScrollView(
@@ -96,64 +110,64 @@ class _AddPostScreenState extends State<AddPostScreen> {
           children: [
             // Image Preview
             _image == null
-              ? GestureDetector(
-                  onTap: () => _showImagePickerModal(),
-                  child: Container(
-                    height: 300,
-                    width: double.infinity,
-                    color: AppTheme.neutral200,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.add_a_photo_outlined,
-                          size: 80,
-                          color: AppTheme.neutral600,
-                        ),
-                        const SizedBox(height: AppTheme.spaceSmall),
-                        Text(
-                          'Tap to select an image',
-                          style: TextStyle(
-                            color: AppTheme.neutral700,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ],
-                    ).animate().fadeIn(),
-                  ),
-                )
-              : Stack(
-                  children: [
-                    Image.file(
-                      _image!,
+                ? GestureDetector(
+                    onTap: () => _showImagePickerModal(),
+                    child: Container(
                       height: 300,
                       width: double.infinity,
-                      fit: BoxFit.cover,
-                    ).animate().fadeIn(),
-                    Positioned(
-                      top: 10,
-                      right: 10,
-                      child: GestureDetector(
-                        onTap: () => setState(() {
-                          _image = null;
-                        }),
-                        child: Container(
-                          padding: const EdgeInsets.all(5),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.7),
-                            shape: BoxShape.circle,
+                      color: AppTheme.neutral200,
+                      child: const Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.add_a_photo_outlined,
+                            size: 80,
+                            color: AppTheme.neutral600,
                           ),
-                          child: const Icon(
-                            Icons.close,
-                            color: Colors.white,
-                            size: 20,
+                          SizedBox(height: AppTheme.spaceSmall),
+                          Text(
+                            'Tap to select an image',
+                            style: TextStyle(
+                              color: AppTheme.neutral700,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ).animate().fadeIn(),
+                    ),
+                  )
+                : Stack(
+                    children: [
+                      Image.file(
+                        _image!,
+                        height: 300,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      ).animate().fadeIn(),
+                      Positioned(
+                        top: 10,
+                        right: 10,
+                        child: GestureDetector(
+                          onTap: () => setState(() {
+                            _image = null;
+                          }),
+                          child: Container(
+                            padding: const EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.7),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.close,
+                              color: Colors.white,
+                              size: 20,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-            
+                    ],
+                  ),
+
             // Caption & Location
             Padding(
               padding: const EdgeInsets.all(AppTheme.spaceSmall),
@@ -172,16 +186,16 @@ class _AddPostScreenState extends State<AddPostScreen> {
                     minLines: 1,
                     textCapitalization: TextCapitalization.sentences,
                   ),
-                  
+
                   const Divider(),
-                  
+
                   // Location Field
                   TextField(
                     controller: _locationController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: 'Add location',
                       border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                      contentPadding: EdgeInsets.symmetric(vertical: 12),
                       prefixIcon: Icon(
                         Icons.location_on_outlined,
                         color: AppTheme.neutral600,
@@ -192,9 +206,9 @@ class _AddPostScreenState extends State<AddPostScreen> {
                 ],
               ),
             ),
-            
+
             const Divider(height: 1),
-            
+
             // Camera/Gallery Buttons
             if (_image == null)
               Padding(
@@ -220,7 +234,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
       ),
     );
   }
-  
+
   Widget _buildPickerButton({
     required IconData icon,
     required String label,
@@ -244,7 +258,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
       ),
     ).animate().fadeIn().scale(begin: const Offset(0.9, 0.9));
   }
-  
+
   void _showImagePickerModal() {
     showModalBottomSheet(
       context: context,

@@ -1,29 +1,29 @@
 {
-    "project_info": {
-        "project_number": "123456789000",
-        "project_id": "instagram-clone-placeholder",
-        "storage_bucket": "instagram-clone-placeholder.appspot.com"
-    },
-    "client": [
-        {
-            "client_info": {
-                "mobilesdk_app_id": "1:123456789000:android:0123456789abcdef",
-                "android_client_info": {
-                    "package_name": "com.example.instagram_clone"
-                }
-            },
-            "oauth_client": [],
-            "api_key": [
-                {
-                    "current_key": "placeholder-api-key"
-                }
-            ],
-            "services": {
-                "appinvite_service": {
-                    "other_platform_oauth_client": []
-                }
-            }
+  "project_info": {
+    "project_number": "256280889890",
+    "project_id": "insta-ghost-v2",
+    "storage_bucket": "insta-ghost-v2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:256280889890:android:d6611fdec936a62050987b",
+        "android_client_info": {
+          "package_name": "com.example.instagram_clone"
         }
-    ],
-    "configuration_version": "1"
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbjYLbL34qGXAQUIRqUCJjeQK1ky3JGCg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
 }

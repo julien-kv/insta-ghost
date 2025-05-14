@@ -1,34 +1,42 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:instagram_clone/controllers/auth_controller.dart';
-import 'package:instagram_clone/controllers/profile_controller.dart';
 import 'package:instagram_clone/controllers/post_controller.dart';
+import 'package:instagram_clone/controllers/profile_controller.dart';
 import 'package:instagram_clone/models/user_model.dart';
 import 'package:instagram_clone/routes/app_pages.dart';
 import 'package:instagram_clone/theme/app_theme.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String userId = AuthController.to.firebaseUser.value?.uid ?? '';
 
   ProfileScreen({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProviderStateMixin {
   final ProfileController _profileController = Get.put(ProfileController());
   final PostController _postController = Get.find<PostController>();
   late bool _isCurrentUser;
+  late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
     _isCurrentUser = AuthController.to.isCurrentUser(widget.userId);
+    _tabController = TabController(length: 2, vsync: this);
     _fetchData();
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   Future<void> _fetchData() async {
@@ -62,7 +70,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             // Profile Header
             SliverToBoxAdapter(
               child: Obx(() {
-                if (_profileController.isLoading.value && _profileController.userProfile.value == null) {
+                if (_profileController.isLoading.value &&
+                    _profileController.userProfile.value == null) {
                   return const SizedBox(
                     height: 200,
                     child: Center(child: CircularProgressIndicator()),
@@ -83,7 +92,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             // Tab Bar
             SliverPersistentHeader(
-              delegate: _ProfileTabBarDelegate(),
+              delegate: _ProfileTabBarDelegate(controller: _tabController),
               pinned: true,
             ),
 
@@ -101,44 +110,71 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 );
               }
 
-              return SliverPadding(
-                padding: const EdgeInsets.all(1),
-                sliver: SliverGrid(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    crossAxisSpacing: 1,
-                    mainAxisSpacing: 1,
-                  ),
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final post = _postController.userPosts[index];
-                      return GestureDetector(
-                        onTap: () {
-                          Get.toNamed(Routes.POST_DETAIL, arguments: post);
-                        },
-                        child: Image.network(
-                          post.imageUrl,
-                          fit: BoxFit.cover,
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return Container(
-                              color: Colors.grey[300],
-                              child: const Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                            );
+              return SliverFillRemaining(
+                child: TabBarView(
+                  controller: _tabController,
+                  children: [
+                    // Grid View
+                    GridView.builder(
+                      padding: const EdgeInsets.all(1),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                        crossAxisSpacing: 1,
+                        mainAxisSpacing: 1,
+                      ),
+                      itemCount: _postController.userPosts.length,
+                      itemBuilder: (context, index) {
+                        final post = _postController.userPosts[index];
+                        return GestureDetector(
+                          onTap: () {
+                            Get.toNamed(Routes.POST_DETAIL, arguments: post);
                           },
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              color: Colors.grey[300],
-                              child: const Icon(Icons.error),
-                            );
-                          },
-                        ),
-                      ).animate().fadeIn(duration: 300.ms);
-                    },
-                    childCount: _postController.userPosts.length,
-                  ),
+                          child: Image.network(
+                            post.imageUrl,
+                            fit: BoxFit.cover,
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return Container(
+                                color: Colors.grey[300],
+                                child: const Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              );
+                            },
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                color: Colors.grey[300],
+                                child: const Icon(Icons.error),
+                              );
+                            },
+                          ),
+                        ).animate().fadeIn(duration: 300.ms);
+                      },
+                    ),
+                    // List View
+                    ListView.builder(
+                      itemCount: _postController.userPosts.length,
+                      itemBuilder: (context, index) {
+                        final post = _postController.userPosts[index];
+                        return Card(
+                          margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                          child: ListTile(
+                            leading: Image.network(
+                              post.imageUrl,
+                              width: 56,
+                              height: 56,
+                              fit: BoxFit.cover,
+                            ),
+                            title: Text(post.caption),
+                            subtitle: Text(post.createdAt.toString()),
+                            onTap: () {
+                              Get.toNamed(Routes.POST_DETAIL, arguments: post);
+                            },
+                          ),
+                        ).animate().fadeIn(duration: 300.ms);
+                      },
+                    ),
+                  ],
                 ),
               );
             }),
@@ -323,12 +359,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
 }
 
 class _ProfileTabBarDelegate extends SliverPersistentHeaderDelegate {
+  final TabController controller;
+
+  const _ProfileTabBarDelegate({required this.controller});
+
   @override
   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
     return Container(
       color: Theme.of(context).scaffoldBackgroundColor,
-      child: const TabBar(
-        tabs: [
+      child: TabBar(
+        controller: controller,
+        tabs: const [
           Tab(icon: Icon(Icons.grid_on)),
           Tab(icon: Icon(Icons.list)),
         ],
