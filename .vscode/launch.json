@@ -1,0 +1,30 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Flutter: Run",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "debug"
+        },
+        {
+            "name": "Flutter: Release",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        },
+        {
+            "name": "Flutter: Profile",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "Flutter: Attach",
+            "request": "attach",
+            "type": "dart",
+            "observatoryUri": "http://127.0.0.1:${port}/ABCDEFG=/",
+            "deviceId": "flutter-tester"
+        }
+    ]
+}
