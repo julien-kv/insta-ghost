@@ -15,7 +15,10 @@ A Flutter application that replicates Instagram's core features using Flutter, G
 - [x] Upload Post
 - [x] View Post
 - [x] Like Post
+- [x] Delete Post
 - [x] Comment Post
+  [x] Like Comment
+  [x] Delete Comment
 - [x] View Profile
 - [x] Edit Profile
 
