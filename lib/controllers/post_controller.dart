@@ -5,6 +5,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:get/get.dart';
 import 'package:instagram_clone/controllers/auth_controller.dart';
 import 'package:instagram_clone/models/post_model.dart';
+import 'package:instagram_clone/routes/app_pages.dart';
 import 'package:uuid/uuid.dart';
 
 class PostController extends GetxController {
@@ -141,6 +142,7 @@ class PostController extends GetxController {
       posts.insert(0, newPost);
 
       Get.snackbar('Success', 'Post created successfully');
+      Get.until((route) => route.settings.name == Routes.MAIN);
       return true;
     } catch (e) {
       print('Error creating post: $e');
